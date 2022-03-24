@@ -9,7 +9,11 @@ edition = "2021"
 keynergy = { git = "https://github.com/keynergy/keynergy-lib", features = [ "analysis" ]}
 clap = { version = "3.1.6", features = [ "derive"] }
 confy = "0.4.0"
+console = "0.15.0"
 dialoguer = "0.10.0"
 dirs = "4.0.0"
 serde = "1.0.136"
 git2 = "0.14.2"
+bincode = "1.3.3"
+indicatif = "0.17.0-rc.9"
+ctrlc = { version = "3.2.1", features = ["termination"]}

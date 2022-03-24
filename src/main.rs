@@ -1,9 +1,14 @@
 mod config;
 mod keyboards;
 //mod load_metrics;
+mod corpus;
+mod data;
 mod setup;
 use clap::{Parser, Subcommand};
 pub use config::Config;
+use console;
+use ctrlc;
+pub use data::Data;
 pub use keyboards::{ansi, matrix};
 pub use setup::setup;
 use std::path::PathBuf;
@@ -20,6 +25,7 @@ struct Cli {
 enum Commands {
     /// Set up data directory
     Setup { dir: Option<String> },
+    /// Manage stored corpora
     Corpus {
         #[clap(subcommand)]
         command: CorpusCommand,
@@ -28,29 +34,58 @@ enum Commands {
 
 #[derive(Debug, Subcommand)]
 enum CorpusCommand {
+    /// List the stored corpora
     List,
-    Use { corpus: String },
+    /// Set the default corpora
+    Default,
+    /// Load a text file as a new corpus
     Load { file: PathBuf },
-}
-
-fn do_setup() -> Config {
-    println!("No data found, setting up.");
-    setup::setup(&None)
+    /// Remove a corpus from the list
+    Remove,
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let mut cfg: Config = confy::load("keynergy").unwrap();
 
-    let cfg: Config = match confy::load("keynergy") {
-        Ok(c) => c,
-        Err(_) => do_setup(),
-    };
+    let mut just_set_up = false;
+    if cfg.data_dir == PathBuf::from("") {
+        println!("Data dir not found, setting up.");
+        setup(&None);
+        just_set_up = true;
+    }
+
+    let cli = Cli::parse();
+    let mut data = Data::load(&cfg);
+
+    let _ = ctrlc::set_handler(move || {
+        let term = console::Term::stdout();
+        let _ = term.show_cursor();
+        std::process::exit(1);
+    });
+
     match &cli.command {
         Commands::Setup { dir } => {
-            setup(dir);
+            if !just_set_up {
+                setup(dir);
+            }
         }
-        Commands::Corpus { command } => {
-            println!("{:?}", command);
-        }
+        Commands::Corpus { command } => match command {
+            CorpusCommand::List => corpus::list(&data),
+            CorpusCommand::Load { file } => {
+                corpus::load(&mut data, file);
+                println!("Writing data...");
+                data.save(&cfg);
+                println!("Done!");
+            }
+            CorpusCommand::Default => {
+                corpus::default(&mut data, &mut cfg);
+                data.save(&cfg);
+            }
+            CorpusCommand::Remove => {
+                corpus::remove(&mut data);
+                data.save(&cfg);
+            }
+            _ => println!("{:?}", command),
+        },
     }
 }

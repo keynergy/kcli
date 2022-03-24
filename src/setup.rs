@@ -27,7 +27,7 @@ pub fn setup(dir: &Option<String>) -> Config {
     fs::create_dir_all(dir).unwrap();
 
     if !layouts.is_dir() {
-        println!("Downloading default layouts from git...");
+        println!("[1/2] Downloading default layouts from git...");
         let repo = Repository::clone("https://github.com/keynergy/layouts", layouts)
             .expect("failed to clone repository");
         let refname = "origin/layouts";
@@ -42,7 +42,7 @@ pub fn setup(dir: &Option<String>) -> Config {
     }
 
     if !metrics.is_dir() {
-        println!("Downloading default metrics from git...");
+        println!("[2/2] Downloading default metrics from git...");
         Repository::clone("https://github.com/keynergy/metrics", metrics)
             .expect("failed to clone repository");
     }
@@ -51,6 +51,7 @@ pub fn setup(dir: &Option<String>) -> Config {
 
     let config = Config {
         data_dir: dir.to_path_buf(),
+        default_corpus: String::new(),
     };
 
     confy::store("keynergy", &config).unwrap();
