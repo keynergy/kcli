@@ -30,7 +30,7 @@ impl Data {
             kb_stats,
         }
     }
-    pub fn save(self, cfg: &Config) {
+    pub fn save(&self, cfg: &Config) {
         let mut f = File::create(cfg.data_dir.join(".corpora")).unwrap();
         f.write(&bincode::serialize(&self.corpus_list).unwrap())
             .unwrap();

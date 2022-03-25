@@ -443,6 +443,7 @@ dependencies = [
  "indicatif",
  "keynergy",
  "serde",
+ "toml",
 ]
 
 [[package]]
@@ -473,7 +474,7 @@ dependencies = [
 [[package]]
 name = "keynergy"
 version = "0.2.3"
-source = "git+https://github.com/keynergy/keynergy-lib#18bc3445e10594278570007dfaad8063abcf17fa"
+source = "git+https://github.com/keynergy/keynergy-lib#e233af63f3998c428660e8e529b245dd57b2184a"
 dependencies = [
  "itertools",
  "ketos",
@@ -997,9 +998,9 @@ checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
 
 [[package]]
 name = "redox_syscall"
-version = "0.2.11"
+version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8380fe0152551244f0747b1bf41737e0f8a74f97a14ccefd1148187271634f3c"
+checksum = "8ae183fc1b06c149f0c1793e1eb447c8b04bfe46d48e9e48bfb8d2d7ed64ecf0"
 dependencies = [
  "bitflags 1.3.2",
 ]
@@ -1022,7 +1023,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7776223e2696f1aa4c6b0170e83212f47296a00424305117d013dfe86fb0fe55"
 dependencies = [
  "getrandom 0.2.5",
- "redox_syscall 0.2.11",
+ "redox_syscall 0.2.12",
  "thiserror",
 ]
 
@@ -1158,7 +1159,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "fastrand",
  "libc",
- "redox_syscall 0.2.11",
+ "redox_syscall 0.2.12",
  "remove_dir_all",
  "winapi",
 ]

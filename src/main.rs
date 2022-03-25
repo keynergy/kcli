@@ -1,6 +1,6 @@
 mod config;
 mod keyboards;
-//mod load_metrics;
+mod load_metrics;
 mod corpus;
 mod data;
 mod setup;
@@ -8,6 +8,7 @@ use clap::{Parser, Subcommand};
 pub use config::Config;
 use console;
 use ctrlc;
+use keynergy::Analyzer;
 pub use data::Data;
 pub use keyboards::{ansi, matrix};
 pub use setup::setup;
@@ -30,6 +31,8 @@ enum Commands {
         #[clap(subcommand)]
         command: CorpusCommand,
     },
+    /// Load metrics for each keyboard, needed for analysis
+    LoadMetrics 
 }
 
 #[derive(Debug, Subcommand)]
@@ -65,27 +68,35 @@ fn main() {
 
     match &cli.command {
         Commands::Setup { dir } => {
-            if !just_set_up {
+	    if !just_set_up {
                 setup(dir);
-            }
+	    }
         }
         Commands::Corpus { command } => match command {
-            CorpusCommand::List => corpus::list(&data),
-            CorpusCommand::Load { file } => {
+	    CorpusCommand::List => corpus::list(&data),
+	    CorpusCommand::Load { file } => {
                 corpus::load(&mut data, file);
                 println!("Writing data...");
                 data.save(&cfg);
                 println!("Done!");
-            }
-            CorpusCommand::Default => {
+		if data.corpus_list.len() == 1 {
+		    for (k, _) in data.corpus_list {
+			cfg.default_corpus = k
+		    }
+		}
+		confy::store("keynergy", cfg).unwrap();
+	    }
+	    CorpusCommand::Default => {
                 corpus::default(&mut data, &mut cfg);
                 data.save(&cfg);
-            }
-            CorpusCommand::Remove => {
+	    }
+	    CorpusCommand::Remove => {
                 corpus::remove(&mut data);
                 data.save(&cfg);
-            }
-            _ => println!("{:?}", command),
+	    }
         },
+	Commands::LoadMetrics => {
+	    load_metrics::load_metrics(&data, &cfg);
+	}
     }
 }

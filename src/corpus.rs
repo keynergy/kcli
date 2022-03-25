@@ -20,14 +20,14 @@ pub fn list(data: &Data) {
 }
 
 fn process(text: String) -> TextData {
-    let pb = ProgressBar::new(text.len() as u64);
+    let pb = ProgressBar::new(text.len() as u64 / 100);
     pb.set_style(
         ProgressStyle::with_template(
-            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({eta})",
+            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len}",
         )
         .unwrap()
         .with_key("eta", |state| format!("{:.0}s", state.eta().as_secs_f64()))
-        .progress_chars("███"),
+        .progress_chars("██ "),
     );
     let mut chars: HashMap<char, u64> = HashMap::with_capacity(30);
     let mut bigrams: HashMap<[char; 2], u64> = HashMap::with_capacity(30 * 30);
@@ -41,7 +41,7 @@ fn process(text: String) -> TextData {
         .enumerate()
     {
         if i % 50000 == 0 {
-            pb.inc(50000);
+            pb.inc(500);
         }
         let ch = chars.entry(v[0]).or_insert(0);
         *ch += 1;
@@ -91,7 +91,8 @@ pub fn default(data: &Data, cfg: &mut Config) {
         .interact_on_opt(&Term::stderr())
         .unwrap()
         .unwrap()]
-    .to_string();
+	.to_string();
+    confy::store("keynergy", cfg).unwrap();
 }
 
 pub fn remove(data: &mut Data) {
