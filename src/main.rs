@@ -25,14 +25,14 @@ enum Commands {
     /// Set up data directory
     Setup { dir: Option<String> },
     /// Manage stored corpora
-    C {
+    Corpus {
         #[clap(subcommand)]
         command: CorpusCommand,
     },
     /// Refresh layouts, metrics
-    R,
+    Refresh,
     /// Analyze a layout
-    A { layout: String },
+    Analyze { layout: String },
 }
 
 #[derive(Debug, Subcommand)]
@@ -72,7 +72,7 @@ fn main() {
                 setup(dir);
             }
         }
-        Commands::C { command } => match command {
+        Commands::Corpus { command } => match command {
             CorpusCommand::List => corpus::list(&data),
             CorpusCommand::Load { file } => {
                 corpus::load(&mut data, file);
@@ -95,10 +95,10 @@ fn main() {
                 data.save(&cfg);
             }
         },
-        Commands::R => {
+        Commands::Refresh => {
             refresh::refresh(&mut data, &cfg);
         }
-        Commands::A { layout } => match data.layouts.get(layout) {
+        Commands::Analyze { layout } => match data.layouts.get(layout) {
             Some(l) => {
                 analyze::analyze(&data, &cfg, &l.formats.standard.clone().unwrap());
             }
