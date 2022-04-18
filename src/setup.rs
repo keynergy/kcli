@@ -1,6 +1,5 @@
 use crate::config::Config;
 use dialoguer::Input;
-use dirs;
 use git2::Repository;
 use std::{fs, path::Path};
 

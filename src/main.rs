@@ -1,14 +1,12 @@
+mod analyze;
 mod config;
-mod keyboards;
-mod load_metrics;
 mod corpus;
 mod data;
+mod keyboards;
+mod refresh;
 mod setup;
 use clap::{Parser, Subcommand};
 pub use config::Config;
-use console;
-use ctrlc;
-use keynergy::Analyzer;
 pub use data::Data;
 pub use keyboards::{ansi, matrix};
 pub use setup::setup;
@@ -27,12 +25,14 @@ enum Commands {
     /// Set up data directory
     Setup { dir: Option<String> },
     /// Manage stored corpora
-    Corpus {
+    C {
         #[clap(subcommand)]
         command: CorpusCommand,
     },
-    /// Load metrics for each keyboard, needed for analysis
-    LoadMetrics 
+    /// Refresh layouts, metrics
+    R,
+    /// Analyze a layout
+    A { layout: String },
 }
 
 #[derive(Debug, Subcommand)]
@@ -68,35 +68,43 @@ fn main() {
 
     match &cli.command {
         Commands::Setup { dir } => {
-	    if !just_set_up {
+            if !just_set_up {
                 setup(dir);
-	    }
+            }
         }
-        Commands::Corpus { command } => match command {
-	    CorpusCommand::List => corpus::list(&data),
-	    CorpusCommand::Load { file } => {
+        Commands::C { command } => match command {
+            CorpusCommand::List => corpus::list(&data),
+            CorpusCommand::Load { file } => {
                 corpus::load(&mut data, file);
                 println!("Writing data...");
                 data.save(&cfg);
                 println!("Done!");
-		if data.corpus_list.len() == 1 {
-		    for (k, _) in data.corpus_list {
-			cfg.default_corpus = k
-		    }
-		}
-		confy::store("keynergy", cfg).unwrap();
-	    }
-	    CorpusCommand::Default => {
-                corpus::default(&mut data, &mut cfg);
+                if data.corpus_list.len() == 1 {
+                    for (k, _) in data.corpus_list {
+                        cfg.default_corpus = k
+                    }
+                }
+                confy::store("keynergy", cfg).unwrap();
+            }
+            CorpusCommand::Default => {
+                corpus::default(&data, &mut cfg);
                 data.save(&cfg);
-	    }
-	    CorpusCommand::Remove => {
+            }
+            CorpusCommand::Remove => {
                 corpus::remove(&mut data);
                 data.save(&cfg);
-	    }
+            }
         },
-	Commands::LoadMetrics => {
-	    load_metrics::load_metrics(&data, &cfg);
-	}
+        Commands::R => {
+            refresh::refresh(&mut data, &cfg);
+        }
+        Commands::A { layout } => match data.layouts.get(layout) {
+            Some(l) => {
+                analyze::analyze(&data, &cfg, &l.formats.standard.clone().unwrap());
+            }
+            None => {
+                println!("Layout not found.")
+            }
+        },
     }
 }

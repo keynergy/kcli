@@ -22,12 +22,10 @@ pub fn list(data: &Data) {
 fn process(text: String) -> TextData {
     let pb = ProgressBar::new(text.len() as u64 / 100);
     pb.set_style(
-        ProgressStyle::with_template(
-            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len}",
-        )
-        .unwrap()
-        .with_key("eta", |state| format!("{:.0}s", state.eta().as_secs_f64()))
-        .progress_chars("██ "),
+        ProgressStyle::with_template("[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len}")
+            .unwrap()
+            .with_key("eta", |state| format!("{:.0}s", state.eta().as_secs_f64()))
+            .progress_chars("██ "),
     );
     let mut chars: HashMap<char, u64> = HashMap::with_capacity(30);
     let mut bigrams: HashMap<[char; 2], u64> = HashMap::with_capacity(30 * 30);
@@ -51,7 +49,7 @@ fn process(text: String) -> TextData {
         }
         if v.len() == 3 {
             let tg = trigrams.entry([v[0], v[1], v[2]]).or_insert(0);
-            let sg = skip_1_grams.entry([v[0], v[1]]).or_insert(0);
+            let sg = skip_1_grams.entry([v[0], v[2]]).or_insert(0);
             *tg += 1;
             *sg += 1;
         }
@@ -91,7 +89,7 @@ pub fn default(data: &Data, cfg: &mut Config) {
         .interact_on_opt(&Term::stderr())
         .unwrap()
         .unwrap()]
-	.to_string();
+    .to_string();
     confy::store("keynergy", cfg).unwrap();
 }
 
