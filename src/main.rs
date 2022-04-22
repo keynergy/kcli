@@ -61,50 +61,50 @@ fn main() {
     let mut data = Data::load(&cfg);
 
     let _ = ctrlc::set_handler(move || {
-        let term = console::Term::stdout();
-        let _ = term.show_cursor();
-        std::process::exit(1);
+	let term = console::Term::stdout();
+	let _ = term.show_cursor();
+	std::process::exit(1);
     });
 
     match &cli.command {
-        Commands::Setup { dir } => {
-            if !just_set_up {
-                setup(dir);
-            }
-        }
-        Commands::Corpus { command } => match command {
-            CorpusCommand::List => corpus::list(&data),
-            CorpusCommand::Load { file } => {
-                corpus::load(&mut data, file);
-                println!("Writing data...");
-                data.save(&cfg);
-                println!("Done!");
-                if data.corpus_list.len() == 1 {
-                    for (k, _) in data.corpus_list {
-                        cfg.default_corpus = k
-                    }
-                }
-                confy::store("keynergy", cfg).unwrap();
-            }
-            CorpusCommand::Default => {
-                corpus::default(&data, &mut cfg);
-                data.save(&cfg);
-            }
-            CorpusCommand::Remove => {
-                corpus::remove(&mut data);
-                data.save(&cfg);
-            }
-        },
-        Commands::Refresh => {
-            refresh::refresh(&mut data, &cfg);
-        }
-        Commands::Analyze { layout } => match data.layouts.get(layout) {
-            Some(l) => {
-                analyze::analyze(&data, &cfg, &l.formats.standard.clone().unwrap());
-            }
-            None => {
-                println!("Layout not found.")
-            }
-        },
+	Commands::Setup { dir } => {
+	    if !just_set_up {
+		setup(dir);
+	    }
+	}
+	Commands::Corpus { command } => match command {
+	    CorpusCommand::List => corpus::list(&data),
+	    CorpusCommand::Load { file } => {
+		corpus::load(&mut data, file);
+		println!("Writing data...");
+		data.save(&cfg);
+		println!("Done!");
+		if data.corpus_list.len() == 1 {
+		    for (k, _) in data.corpus_list {
+			cfg.default_corpus = k
+		    }
+		}
+		confy::store("keynergy", cfg).unwrap();
+	    }
+	    CorpusCommand::Default => {
+		corpus::default(&data, &mut cfg);
+		data.save(&cfg);
+	    }
+	    CorpusCommand::Remove => {
+		corpus::remove(&mut data);
+		data.save(&cfg);
+	    }
+	},
+	Commands::Refresh => {
+	    refresh::refresh(&mut data, &cfg);
+	}
+	Commands::Analyze { layout } => match data.layouts.get(layout) {
+	    Some(l) => {
+		analyze::analyze(&data, &cfg, &l.formats.standard.clone().unwrap());
+	    }
+	    None => {
+		println!("Layout not found.")
+	    }
+	},
     }
 }

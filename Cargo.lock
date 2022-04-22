@@ -458,9 +458,8 @@ dependencies = [
 
 [[package]]
 name = "keynergy"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8fd11278583883d0da7036b6c0a5710006e95d632a29fcda2cadccf67ebe0e3"
+version = "0.2.5"
+source = "git+https://github.com/keynergy/keynergy#9c46b590a012d00097927516ac14bd556dbbc4ae"
 dependencies = [
  "ketos",
  "ketos_derive",
