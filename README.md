@@ -27,10 +27,22 @@ Download that and run `kcli corpus load ./tr_quotes.txt`. Then run `kcli refresh
 ```
 kcli analyze LAYOUT
 ```
-This prints the layout grid and returns all the statistics you have defined. That's it for now.
+This prints the layout grid and returns all the statistics you have defined.
+#### Most/Least
+```
+kcli least sfb\ distance
+```
+```
+kcli most alternation
+```
+Prints the top 15 layouts with the most or least of the given metric. 
+The number can optionally be changed by appending the number to the end of the command.
+```
+kcli least sfs 20
+```
 
 ## Extending Metrics
 Metrics are defined in your Keynergy data folder. They are written in the [Ketos](https://docs.rs/ketos/0.12.0/ketos/) extension lisp language,
 and described in a toml file. I recommend looking at existing metric functions to figure out how it works;
 at some point I'll write some better documentation here. The same function can be used for bigrams or skipgrams by simply creating a separate entry
-that takes skipgrams instead - see Same-finger Bigrams/Skipgrams as an example.
+that takes skipgrams instead - see sfb and sfs as an example.
